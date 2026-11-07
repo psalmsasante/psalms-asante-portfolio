@@ -1713,7 +1713,7 @@ function startHeroTrail() {
 
 /* 7. Custom cursor -------------------------------------------------------------------
    For mouse users the normal pointer is replaced by a small white dot that
-   sits exactly on the mouse. Over a project card it opens into a 130px ring
+   sits exactly on the mouse. Over a project card or "Next Project" it opens into a 130px ring
    with an arrow and trails the mouse on a spring (stiffness 500, damping 60).
    It uses "difference" blending (see the CSS), so it turns dark over light
    images and stays visible everywhere. */
@@ -1774,7 +1774,7 @@ function startCustomCursor() {
   };
   requestAnimationFrame(follow);
 
-  document.querySelectorAll(".project-card").forEach((card) => {
+  document.querySelectorAll(".project-card, .next-project a").forEach((card) => {
     card.addEventListener("mouseenter", () => {
       overCard = true;
       cursor.classList.add("is-active");
