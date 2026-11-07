@@ -1005,6 +1005,13 @@ body.no-scroll {
   color: var(--color-text-dim);
 }
 
+/* With the custom cursor on, keep the text bright so the ring inverts it
+   (same "difference" contrast as over the project images) instead of
+   blending into dimmed grey text. */
+html.has-custom-cursor .next-project a:hover {
+  color: var(--color-text);
+}
+
 .site-footer {
   position: relative;
   z-index: 1;
