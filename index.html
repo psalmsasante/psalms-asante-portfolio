@@ -1657,6 +1657,7 @@ function startSmoothScroll() {
   let running = false;
 
   const step = (now) => {
+    if (!running) return; // glide was cancelled (e.g. trackpad took over)
     const t = Math.min(1, (now - startTime) / DURATION);
     current = from + (target - from) * ease(t);
     window.scrollTo(0, current);
@@ -1681,8 +1682,27 @@ function startSmoothScroll() {
     document.body.classList.contains("no-scroll") ||
     document.body.classList.contains("menu-open");
 
+  // Only mouse wheels get the glide. Trackpads (and Magic Mice) already
+  // scroll smoothly with their own momentum, so they're left fully native:
+  // they send lots of tiny, fractional or sideways deltas, and once one is
+  // seen we stay native until the gesture (and its momentum) has finished.
+  let trackpadUntil = 0;
+  const looksLikeTrackpad = (event) =>
+    event.deltaMode === 0 &&
+    (event.deltaX !== 0 ||
+     !Number.isInteger(event.deltaY) ||
+     Math.abs(event.deltaY) < 50);
+
   window.addEventListener("wheel", (event) => {
     if (event.ctrlKey || scrollingLocked()) return; // pinch-zoom / open overlays
+
+    const now = performance.now();
+    if (now < trackpadUntil || looksLikeTrackpad(event)) {
+      trackpadUntil = now + 400; // keep native through the momentum tail
+      running = false;           // stop any glide so they don't fight
+      current = target = window.scrollY;
+      return;                    // browser scrolls natively
+    }
     event.preventDefault();
 
     let delta = event.deltaY;
